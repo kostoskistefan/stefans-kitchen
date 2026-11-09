@@ -1,0 +1,32 @@
+---
+import { Image } from 'astro:assets';
+import { findRecipeImages } from '../lib/findRecipeImage';
+
+type Props = {
+  slug: string;
+  title: string;
+  widths: number[];
+  sizes: string;
+  loading?: 'lazy' | 'eager';
+};
+const { slug, title, widths, sizes, loading = 'lazy' } = Astro.props;
+const image = findRecipeImages(slug)[0];
+---
+<div class="frame">
+  {image === undefined
+    ? <div class="fallback" aria-hidden="true">{title.charAt(0)}</div>
+    : <Image src={image} alt={title} widths={widths} sizes={sizes} loading={loading} />}
+</div>
+<style>
+  .frame { width: 100%; height: 100%; }
+  .frame :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .fallback {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    font: 600 4.5rem 'Fraunces', Georgia, serif;
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+</style>

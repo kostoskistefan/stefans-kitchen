@@ -1,0 +1,123 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import RecipeGallery from '../../components/RecipeGallery.astro';
+import ServingsStepper from '../../components/ServingsStepper.astro';
+import IngredientList from '../../components/IngredientList.astro';
+import { findRecipeImages } from '../../lib/findRecipeImage';
+import { loadRecipes } from '../../lib/recipes';
+import { withBase } from '../../lib/withBase';
+
+export function getStaticPaths() {
+  return loadRecipes().map((recipe) => ({ params: { slug: recipe.slug }, props: { recipe } }));
+}
+
+const { recipe } = Astro.props;
+const images = findRecipeImages(recipe.slug);
+---
+<Layout title={`${recipe.title} | Stefan's Kitchen`} description={recipe.description}>
+  <a class="back muted" href={withBase('/')}>&larr; All recipes</a>
+  <header class="recipe-header">
+      <h1>{recipe.title}</h1>
+      <p class="muted description">{recipe.description}</p>
+      <ul class="facts">
+        {recipe.time.length > 0 && <li>{recipe.time}</li>}
+        {recipe.tags.map((tag) => <li>{tag}</li>)}
+      </ul>
+  </header>
+  {images.length > 0 && (
+    <section class="gallery-section">
+      <RecipeGallery images={images} title={recipe.title} />
+    </section>
+  )}
+
+  <div class="recipe-layout">
+    <aside class="ingredients-panel">
+      <div class="panel-heading">
+        <h2>Ingredients</h2>
+        <ServingsStepper servings={recipe.servings} />
+      </div>
+      <IngredientList ingredients={recipe.ingredients} />
+    </aside>
+
+    <section class="instructions">
+      <h2>Instructions</h2>
+      <ol class="step-list">
+        {recipe.steps.map((step) => (
+          <li>
+            <p>
+              {step.map((part) => {
+                if (part.type === 'ingredient') return <span class="step-ingredient">{part.name}</span>;
+                if (part.type === 'timer') return <span class="step-timer">{part.label}</span>;
+                if (part.type === 'cookware') return <span class="step-cookware">{part.name}</span>;
+                return part.value;
+              })}
+            </p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </div>
+  <script>
+    import '../../scripts/servings-scaler';
+  </script>
+</Layout>
+<style>
+  .back { display: inline-block; margin-bottom: 1rem; text-decoration: none; font-size: 0.95rem; }
+  .back:hover { color: var(--accent); }
+  .recipe-header { margin-bottom: 2rem; }
+  h1 { font-size: clamp(2rem, 5vw, 3.25rem); }
+  .description { margin: 1rem 0 0; font-size: 1.15rem; }
+  .facts { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
+  .facts li {
+    padding: 0.25rem 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+  }
+  .gallery-section { margin-bottom: 3rem; }
+
+  .recipe-layout { display: grid; gap: 2.5rem; }
+  .ingredients-panel {
+    padding: 1.75rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .panel-heading h2 { white-space: nowrap; }
+  .panel-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1rem; }
+  .recipe-layout h2 { font-size: 1.4rem; }
+  .instructions h2 { margin-bottom: 1.5rem; }
+
+  .step-list { counter-reset: step; margin: 0; padding: 0; list-style: none; max-width: 42rem; }
+  .step-list li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    gap: 1.1rem;
+    margin-bottom: 1.75rem;
+  }
+  .step-list li::before {
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 50%;
+  }
+  .step-list p { margin: 0.15rem 0 0; line-height: 1.7; }
+  .step-ingredient { font-weight: 600; }
+  .step-timer { font-weight: 600; color: var(--accent); }
+  .step-cookware { font-style: italic; }
+
+  @media (min-width: 60rem) {
+    .recipe-layout { grid-template-columns: 25rem 1fr; gap: 4rem; align-items: start; }
+    .ingredients-panel { position: sticky; top: 1.5rem; }
+  }
+</style>

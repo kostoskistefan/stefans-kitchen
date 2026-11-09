@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RecipeCard from '../components/RecipeCard.astro';
+import { loadRecipes } from '../lib/recipes';
+
+const recipes = loadRecipes();
+---
+<Layout title="Stefan's Kitchen">
+  <section class="hero">
+    <h1>What are we cooking today?</h1>
+    <div class="search">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+      <input type="search" placeholder="Search recipes" aria-label="Search recipes" data-recipe-search />
+    </div>
+  </section>
+  <ul class="recipe-grid">
+    {recipes.map((recipe) => <RecipeCard recipe={recipe} />)}
+  </ul>
+  <p class="muted" data-empty-message hidden>No recipes match your search.</p>
+  <script>
+    import '../scripts/recipe-search';
+  </script>
+</Layout>
+<style>
+  .hero { max-width: 40rem; margin: 0 auto; padding: 3rem 0; text-align: center; }
+  h1 { font-size: clamp(2.2rem, 6vw, 3.5rem); text-wrap: balance; }
+  .search { position: relative; margin-top: 1.75rem; color: var(--muted); }
+  .search svg { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); pointer-events: none; }
+  .search input {
+    width: 100%;
+    padding: 0.9rem 1.1rem 0.9rem 3rem;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font: inherit;
+    appearance: none;
+    transition: border-color 0.15s;
+  }
+  .search input:focus-visible { outline: none; border-color: var(--accent); }
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: 1.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

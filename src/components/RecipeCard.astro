@@ -1,0 +1,62 @@
+---
+import RecipePhoto from './RecipePhoto.astro';
+import type { Recipe } from '../lib/recipes';
+import { withBase } from '../lib/withBase';
+
+type Props = { recipe: Recipe };
+const { recipe } = Astro.props;
+const searchText = `${recipe.title} ${recipe.description} ${recipe.tags.join(' ')}`.toLowerCase();
+---
+<li class="card" data-recipe-card data-search-text={searchText}>
+  <a href={withBase(`/recipes/${recipe.slug}/`)}>
+    <div class="photo">
+      <RecipePhoto slug={recipe.slug} title={recipe.title} widths={[400, 800]} sizes="(min-width: 48rem) 24rem, 100vw" />
+    </div>
+    <div class="body">
+      <h2>{recipe.title}</h2>
+      <p class="description">{recipe.description}</p>
+      <p class="meta">{recipe.time} &middot; {recipe.servings} servings</p>
+    </div>
+  </a>
+</li>
+<style>
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .card[hidden] { display: none; }
+  .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  a { display: block; text-decoration: none; }
+  .photo { aspect-ratio: 4 / 3; background: var(--accent-soft); }
+
+  /* The body has a fixed height so every card is identical, whatever the text length. */
+  .body {
+    display: flex;
+    flex-direction: column;
+    height: 12.5rem;
+    padding: 1.25rem 1.5rem 1.4rem;
+  }
+  h2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 1.35rem;
+    line-height: 1.2;
+  }
+  .description {
+    flex: 1;
+    min-height: 0;
+    margin: 0.5rem 0 0;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 1.4em), transparent);
+  }
+  .meta { margin: 0.75rem 0 0; font-size: 0.85rem; font-weight: 500; color: var(--accent); }
+</style>

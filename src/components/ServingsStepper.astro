@@ -1,0 +1,57 @@
+---
+type Props = { servings: number };
+const { servings } = Astro.props;
+---
+<div class="stepper" data-base-servings={servings}>
+  <button type="button" data-servings-decrease aria-label="Fewer servings">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /></svg>
+  </button>
+  <label class="value">
+    <input type="number" min="1" inputmode="numeric" value={servings} data-servings-input aria-label="Number of servings" style={`width: ${String(servings).length}ch`} />
+    <span class="unit">servings</span>
+  </label>
+  <button type="button" data-servings-increase aria-label="More servings">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+  </button>
+</div>
+<style>
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem;
+    background: var(--background);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+  }
+  .stepper:focus-within { border-color: var(--accent); }
+  button {
+    display: grid;
+    place-items: center;
+    width: 1.85rem;
+    height: 1.85rem;
+    flex: none;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  button:hover { background: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
+  .value { display: flex; align-items: center; gap: 0.3rem; padding: 0 0.6rem; cursor: text; }
+  input {
+    min-width: 1ch;
+    padding: 0;
+    color: var(--text);
+    background: transparent;
+    border: 0;
+    text-align: center;
+    font: 600 1.05rem 'Inter', system-ui, sans-serif;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  input::-webkit-inner-spin-button,
+  input::-webkit-outer-spin-button { appearance: none; margin: 0; }
+  input:focus-visible { outline: none; }
+  .unit { color: var(--muted); font-size: 0.8rem; }
+</style>

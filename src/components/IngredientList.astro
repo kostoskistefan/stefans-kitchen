@@ -1,0 +1,54 @@
+---
+import { formatQuantity } from '../lib/formatQuantity';
+import type { RecipeIngredient } from '../lib/recipes';
+
+type Props = { ingredients: RecipeIngredient[] };
+const { ingredients } = Astro.props;
+---
+<ul class="ingredient-list">
+  {ingredients.map((ingredient) => (
+    <li>
+      <label>
+        <input class="check" type="checkbox" />
+        <span class="amount" data-base-quantity={ingredient.quantity} data-unit={ingredient.unit}>
+          {ingredient.quantity === null ? '' : `${formatQuantity(ingredient.quantity)} ${ingredient.unit}`.trim()}
+        </span>
+        <span class="name">{ingredient.name}</span>
+      </label>
+    </li>
+  ))}
+</ul>
+<style>
+  .ingredient-list { list-style: none; margin: 1.25rem 0 0; padding: 0; }
+  li + li { border-top: 1px solid var(--line); }
+  label { display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 0; cursor: pointer; }
+  .amount { min-width: 5.5rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .name { transition: color 0.15s; }
+  .check {
+    display: grid;
+    place-content: center;
+    flex: none;
+    width: 1.4rem;
+    height: 1.4rem;
+    margin: 0;
+    background: var(--surface);
+    border: 2px solid var(--line-strong);
+    border-radius: 50%;
+    cursor: pointer;
+    appearance: none;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .check::after {
+    content: '';
+    width: 0.75rem;
+    height: 0.75rem;
+    background: var(--accent-contrast);
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    transform: scale(0);
+    transition: transform 0.15s;
+  }
+  .check:checked { background: var(--accent); border-color: var(--accent); }
+  .check:checked::after { transform: scale(1); }
+  label:has(.check:checked) .amount,
+  label:has(.check:checked) .name { color: var(--muted); text-decoration: line-through; }
+</style>
